@@ -1,71 +1,78 @@
-// ATS keyword-match card: score, coverage meters, matched vs missing skills.
-import { useState } from 'react'
-import Icon from './Icon.jsx'
-import ScoreRing from './ScoreRing.jsx'
-import { Card, Chip, Meter } from './ui.jsx'
-import { pct } from '../lib/format.js'
+// Skills tab: missing must-haves, matched requirements, nice-to-haves, ignored mentions.
+import { StatusLabel } from './ui.jsx'
 
 export default function AtsPanel({ ats }) {
-  const [showDetail, setShowDetail] = useState(false)
-  const must = ats.matched.filter((m) => m.type === 'must_have')
-  const nice = ats.matched.filter((m) => m.type === 'nice_to_have')
-
   return (
-    <Card title="ATS keyword match" subtitle={`Against typical ${ats.role_name} requirements`}>
-      <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-        <ScoreRing value={ats.ats_score} label="ATS score" size={128} stroke={10} />
-        <div className="w-full flex-1 space-y-3">
-          <Meter label="Must-have coverage" value={ats.must_have_coverage} tone="neutral" valueLabel={pct(ats.must_have_coverage)} />
-          <Meter label="Nice-to-have coverage" value={ats.nice_to_have_coverage} tone="neutral" valueLabel={pct(ats.nice_to_have_coverage)} />
-          <Meter label="Wording similarity to role" value={ats.tfidf.score} max={100} tone="neutral"
-            valueLabel={`${Math.round(ats.tfidf.score)}%`} />
-          <button type="button" onClick={() => setShowDetail((v) => !v)} aria-expanded={showDetail}
-            className="focus-ring inline-flex items-center gap-1 rounded text-xs font-medium text-accent-ink hover:underline">
-            How is this calculated?
-            <Icon name="chevron" className={`size-3.5 transition-transform ${showDetail ? 'rotate-180' : ''}`} />
-          </button>
-          {showDetail && (
-            <div className="animate-rise rounded-lg bg-card-2 p-3 text-xs leading-relaxed text-ink-2">
-              Keyword score {ats.keyword_score} (70% must-have, 30% nice-to-have) blended 80/20 with
-              text similarity {ats.tfidf.score}, minus a formatting penalty of {ats.format_penalty.points} ({ats.format_penalty.detail}).
-              This is a transparent heuristic, not a vendor-verified ATS result.
-            </div>
-          )}
-        </div>
-      </div>
+    <div className="grid gap-12 lg:grid-cols-2">
+      <section>
+        <Heading title="Missing must-haves" count={ats.missing_must_have.length}
+          note={`Requirements typical ${ats.role_name} postings expect`} />
+        {ats.missing_must_have.length ? (
+          <ul className="divide-y divide-line">
+            {ats.missing_must_have.map((m) => (
+              <li key={m.label} className="flex items-start justify-between gap-4 py-3.5">
+                <div className="min-w-0">
+                  <StatusLabel tone="critical" className="!text-ink">{m.label}</StatusLabel>
+                  <p className="mt-1 pl-3 text-xs text-ink-3">Accepted: {m.alternatives.join(', ')}</p>
+                </div>
+                <span className="shrink-0 text-xs tabular-nums text-ink-3">weight {m.weight}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="py-3.5 text-sm text-ink-2">Every must-have requirement is covered.</p>
+        )}
+      </section>
 
-      <div className="mt-6 space-y-4">
-        <SkillGroup title="Missing must-have skills" empty="None. Every must-have requirement is covered."
-          items={ats.missing_must_have.map((m) => ({ key: m.label, label: m.label, title: `Accepted: ${m.alternatives.join(', ')}` }))}
-          variant="missing" />
-        <SkillGroup title="Matched requirements" empty="No role requirements matched yet."
-          items={[...must, ...nice].map((m) => ({ key: m.label, label: m.label, title: `Found as ${m.found_as.join(', ')} in ${m.sections.join(', ')}` }))}
-          variant="matched" />
-        <SkillGroup title="Nice-to-have skills to consider" empty="All nice-to-have skills found."
-          items={ats.missing_nice_to_have.map((m) => ({ key: m.label, label: m.label }))} variant="neutral" />
+      <section>
+        <Heading title="Matched" count={ats.matched.length} note="Where each requirement was found" />
+        {ats.matched.length ? (
+          <ul className="divide-y divide-line">
+            {ats.matched.map((m) => (
+              <li key={m.label} className="flex items-start justify-between gap-4 py-3.5">
+                <div className="min-w-0">
+                  <StatusLabel tone="good" className="!text-ink">{m.label}</StatusLabel>
+                  <p className="mt-1 pl-3 text-xs text-ink-3">
+                    {m.found_as.join(', ')} <span aria-hidden="true">·</span> {m.sections.join(', ')}
+                  </p>
+                </div>
+                <span className="shrink-0 text-xs text-ink-3">{m.type === 'must_have' ? 'must-have' : 'bonus'}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="py-3.5 text-sm text-ink-2">No role requirements matched yet.</p>
+        )}
+      </section>
+
+      <section className="lg:col-span-2">
+        <Heading title="Worth adding" count={ats.missing_nice_to_have.length} note="Bonus skills, only if you have them" />
+        {ats.missing_nice_to_have.length ? (
+          <ul className="flex flex-wrap gap-2">
+            {ats.missing_nice_to_have.map((m) => (
+              <li key={m.label} className="rounded-full border border-line px-3 py-1 text-sm text-ink-2">{m.label}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-ink-2">All bonus skills found.</p>
+        )}
         {ats.ignored.length > 0 && (
-          <p className="text-xs text-ink-3">
+          <p className="mt-6 text-xs leading-relaxed text-ink-3">
             Not counted: {ats.ignored.map((i) => `${i.surface} (${i.reason.toLowerCase()})`).join('; ')}.
           </p>
         )}
-      </div>
-    </Card>
+      </section>
+    </div>
   )
 }
 
-function SkillGroup({ title, items, variant, empty }) {
+function Heading({ title, count, note }) {
   return (
-    <div>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-3">
-        {title} <span className="font-normal normal-case">({items.length})</span>
+    <header className="mb-3">
+      <h3 className="flex items-baseline gap-2 text-[15px] font-medium text-ink">
+        {title} <span className="text-sm tabular-nums text-ink-3">{count}</span>
       </h3>
-      {items.length ? (
-        <ul className="flex flex-wrap gap-1.5">
-          {items.map((item) => <Chip key={item.key} variant={variant} title={item.title}>{item.label}</Chip>)}
-        </ul>
-      ) : (
-        <p className="text-sm text-ink-3">{empty}</p>
-      )}
-    </div>
+      <p className="mt-0.5 text-xs text-ink-3">{note}</p>
+    </header>
   )
 }

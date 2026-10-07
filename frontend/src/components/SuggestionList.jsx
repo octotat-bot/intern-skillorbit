@@ -1,73 +1,98 @@
-// Prioritized suggestions with a priority filter; each card expands to show evidence.
+// Prioritized suggestions as a quiet list; each row expands to show its evidence.
 import { useId, useState } from 'react'
 import Icon from './Icon.jsx'
-import { Card, StatusBadge } from './ui.jsx'
-import { PRIORITY, impactLabel } from '../lib/format.js'
+import { PRIORITY, TONE, impactParts } from '../lib/format.js'
 
-const FILTERS = ['all', 'high', 'medium', 'low']
+const FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'high', label: 'High' },
+  { id: 'medium', label: 'Medium' },
+  { id: 'low', label: 'Low' },
+]
 
 export default function SuggestionList({ feedback }) {
   const [filter, setFilter] = useState('all')
   const items = feedback.suggestions.filter((s) => filter === 'all' || s.priority === filter)
   const counts = { all: feedback.total, ...feedback.by_priority }
 
+  if (!feedback.total) {
+    return (
+      <div className="py-16 text-center">
+        <div className="mx-auto grid size-10 place-items-center rounded-full bg-good/10 text-good-ink">
+          <Icon name="check" className="size-5" />
+        </div>
+        <p className="mt-4 font-medium text-ink">Nothing to fix</p>
+        <p className="mt-1 text-sm text-ink-2">No rule found an improvement for this role.</p>
+      </div>
+    )
+  }
+
   return (
-    <Card title="Improvement suggestions"
-      subtitle={feedback.total ? `${feedback.total} found, sorted by priority and estimated impact` : 'Nothing to fix'}>
-      <div role="group" aria-label="Filter by priority" className="mb-4 flex flex-wrap gap-1.5">
+    <div>
+      <div role="group" aria-label="Filter by priority" className="mb-2 flex flex-wrap gap-1">
         {FILTERS.map((f) => (
-          <button key={f} type="button" aria-pressed={filter === f} onClick={() => setFilter(f)}
-            className={`focus-ring rounded-lg border px-2.5 py-1 text-xs font-medium capitalize transition
-              ${filter === f ? 'border-accent bg-accent/15 text-ink' : 'border-line text-ink-3 hover:text-ink'}`}>
-            {f} <span className="tabular-nums text-ink-3">{counts[f] ?? 0}</span>
+          <button key={f.id} type="button" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}
+            className={`focus-ring h-8 rounded-full px-3 text-sm transition-colors
+              ${filter === f.id ? 'bg-ink text-page' : 'text-ink-3 hover:bg-surface-2 hover:text-ink'}`}>
+            {f.label} <span className="ml-0.5 tabular-nums opacity-60">{counts[f.id] ?? 0}</span>
           </button>
         ))}
       </div>
+
       {items.length ? (
-        <ol className="space-y-2">
-          {items.map((item, index) => <SuggestionCard key={`${item.rule_id}-${item.title}`} item={item} index={index} />)}
+        <ol className="divide-y divide-line">
+          {items.map((item, index) => (
+            <SuggestionRow key={`${item.rule_id}-${item.title}`} item={item} index={index} />
+          ))}
         </ol>
       ) : (
-        <p className="rounded-lg bg-card-2 p-4 text-sm text-ink-2">
-          {feedback.total ? 'No suggestions at this priority.' : 'Great work. No rule found anything to improve.'}
-        </p>
+        <p className="py-10 text-center text-sm text-ink-3">No suggestions at this priority.</p>
       )}
       {feedback.shown < feedback.total && (
-        <p className="mt-3 text-xs text-ink-3">Showing the top {feedback.shown} of {feedback.total}.</p>
+        <p className="mt-4 text-xs text-ink-3">Showing the top {feedback.shown} of {feedback.total}.</p>
       )}
-    </Card>
+    </div>
   )
 }
 
-function SuggestionCard({ item, index }) {
+function SuggestionRow({ item, index }) {
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const priority = PRIORITY[item.priority]
-  const impact = impactLabel(item.estimated_impact)
+  const impact = impactParts(item.estimated_impact)
 
   return (
-    <li className="animate-rise overflow-hidden rounded-xl border border-line bg-card-2/60 transition hover:border-ink-3/60"
-      style={{ animationDelay: `${Math.min(index, 10) * 30}ms` }}>
+    <li className="animate-rise" style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}>
       <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls={panelId}
-        className="focus-ring flex w-full items-start gap-3 rounded-xl p-3.5 text-left">
+        className="focus-ring group -mx-3 flex w-[calc(100%+1.5rem)] items-start gap-5 rounded-2xl px-3 py-5 text-left transition-colors hover:bg-surface-2/60">
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge tone={priority.tone} icon={priority.icon}>{priority.label}</StatusBadge>
-            {impact && <span className="text-xs font-medium text-ink-3 tabular-nums">{impact}</span>}
-            <span className="text-xs text-ink-3">{item.rule_id}</span>
-          </div>
-          <p className="mt-1.5 font-medium text-ink">{item.title}</p>
-          <p className="mt-0.5 text-sm text-ink-2">{item.suggestion}</p>
+          <p className="flex items-center gap-2 text-xs text-ink-3">
+            <span aria-hidden="true" className={`size-1.5 rounded-full ${TONE[priority.tone].dot}`} />
+            <span className={TONE[priority.tone].ink}>{priority.label}</span>
+            <span aria-hidden="true">·</span>
+            <span className="capitalize">{item.category}</span>
+          </p>
+          <p className="mt-1.5 text-[15px] font-medium text-ink">{item.title}</p>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-2">{item.suggestion}</p>
         </div>
-        <Icon name="chevron" className={`mt-1 size-4 shrink-0 text-ink-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <div className="flex shrink-0 items-center gap-4 pt-5">
+          {impact && (
+            <span className="text-right">
+              <span className="block text-sm tabular-nums text-ink">{impact.value}</span>
+              <span className="block text-[11px] text-ink-3">{impact.unit}</span>
+            </span>
+          )}
+          <Icon name="chevron" className={`size-4 text-ink-3 transition-transform duration-300 group-hover:text-ink ${open ? 'rotate-180' : ''}`} />
+        </div>
       </button>
-      <div id={panelId} hidden={!open} className="border-t border-line px-3.5 py-3">
-        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-3">Evidence</p>
-        <ul className="space-y-1 text-sm text-ink-2">
-          {item.evidence.map((line) => (
-            <li key={line} className="flex gap-2"><span aria-hidden="true" className="text-ink-3">›</span><span className="break-words">{line}</span></li>
-          ))}
-        </ul>
+      <div id={panelId} hidden={!open} className="pb-5">
+        <div className="ml-0 border-l border-line-strong pl-4">
+          <p className="eyebrow mb-2">Evidence</p>
+          <ul className="space-y-1.5 text-sm text-ink-2">
+            {item.evidence.map((line) => <li key={line} className="break-words">{line}</li>)}
+          </ul>
+          <p className="mt-3 font-mono text-[11px] text-ink-3">rule {item.rule_id}</p>
+        </div>
       </div>
     </li>
   )

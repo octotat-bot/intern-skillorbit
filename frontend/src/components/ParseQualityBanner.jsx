@@ -1,30 +1,36 @@
-// Warning banner shown when the file has ATS formatting risks.
+// Slim notice shown when the file has ATS formatting risks.
+import { useState } from 'react'
 import Icon from './Icon.jsx'
 
 export default function ParseQualityBanner({ quality }) {
+  const [open, setOpen] = useState(false)
   if (!quality?.ats_risk) return null
   const severe = quality.level === 'poor'
+  const first = quality.issues[0]
+
   return (
     <section role="status" aria-live="polite"
-      className={`animate-rise rounded-2xl border p-4 sm:p-5 ${severe ? 'border-critical/50 bg-critical/10' : 'border-warning/50 bg-warning/10'}`}>
-      <div className="flex items-start gap-3">
-        <Icon name="alert" className={`mt-0.5 size-5 shrink-0 ${severe ? 'text-critical-ink' : 'text-warning-ink'}`} />
-        <div className="min-w-0">
-          <h2 className="font-semibold text-ink">
-            ATS formatting risk: parse quality {quality.level} ({quality.score}/100)
-          </h2>
-          <p className="mt-0.5 text-sm text-ink-2">
-            Applicant tracking systems may misread this file. This also lowers the ATS score below.
+      className={`animate-rise rounded-2xl border px-4 py-3.5 sm:px-5 ${severe ? 'border-critical/30 bg-critical/[0.06]' : 'border-warning/30 bg-warning/[0.06]'}`}>
+      <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
+        <Icon name="alert" className={`mt-0.5 size-4 shrink-0 ${severe ? 'text-critical-ink' : 'text-warning-ink'}`} />
+        <div className="min-w-0 flex-1 text-sm">
+          <p className="text-ink">
+            <span className="font-medium">Formatting risk</span>
+            <span className="text-ink-2"> · parse quality {quality.level} ({quality.score}/100). {first?.message}</span>
           </p>
-          <ul className="mt-2 space-y-1 text-sm text-ink-2">
-            {quality.issues.map((issue) => (
-              <li key={issue.code} className="flex gap-2">
-                <span aria-hidden="true">•</span>
-                <span><span className="font-medium text-ink">{issue.message}</span> <span className="text-ink-3">({issue.evidence})</span></span>
-              </li>
-            ))}
-          </ul>
+          {open && (
+            <ul className="mt-2 space-y-1 text-ink-2">
+              {quality.issues.map((issue) => (
+                <li key={issue.code}>{issue.message} <span className="text-ink-3">{issue.evidence}</span></li>
+              ))}
+              <li className="text-ink-3">This lowers the ATS score; the resume score is unaffected.</li>
+            </ul>
+          )}
         </div>
+        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
+          className="focus-ring shrink-0 rounded text-sm text-ink-2 underline-offset-4 hover:text-ink hover:underline">
+          {open ? 'Hide details' : 'Details'}
+        </button>
       </div>
     </section>
   )
