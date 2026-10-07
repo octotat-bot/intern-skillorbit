@@ -7,9 +7,9 @@ import { ErrorState, Skeleton } from '../components/ui.jsx'
 import { errorMessage, fetchRoles, uploadResume } from '../api/client.js'
 
 const FEATURES = [
-  { title: 'Explainable /100 score', text: 'Six weighted parameters, each with the evidence behind every point.' },
-  { title: 'ATS keyword match', text: 'Must-have and nice-to-have skills for your target role, plus layout risks.' },
-  { title: 'Prioritized fixes', text: '40 deterministic rules, with optional AI rewrites grounded in cited guidance.' },
+  { figure: '/100', title: 'Explainable score', text: 'Six weighted parameters with the evidence behind every point.' },
+  { figure: 'ATS', title: 'Keyword match', text: 'Must-have skills for your role, plus layout risks.' },
+  { figure: '40', title: 'Rules', text: 'Prioritized fixes, with optional AI rewrites that cite sources.' },
 ]
 
 export default function UploadPage() {
@@ -36,7 +36,7 @@ export default function UploadPage() {
     setPhase('uploading'); setProgress(0); setError(null)
     try {
       const receipt = await uploadResume(file, setProgress)
-      navigate(`/analysis/${receipt.resume_id}?role=${role}`, { state: { receipt } })
+      navigate(`/analysis/${receipt.resume_id}?role=${role}`)
     } catch (err) {
       setPhase('error'); setError(errorMessage(err))
     }
@@ -44,23 +44,29 @@ export default function UploadPage() {
 
   const busy = phase === 'uploading'
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <div className="animate-rise text-center">
-        <p className="text-sm font-medium text-accent-ink">AI resume analyzer for students</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">See your resume the way a recruiter and an ATS do</h1>
-        <p className="mx-auto mt-3 max-w-2xl text-ink-2">
-          Upload a resume and pick a role. You get a score out of 100, an ATS keyword match, missing skills and a prioritized fix list. Every result shows the evidence that produced it.
+    <div className="mx-auto max-w-4xl px-4 pb-16 pt-16 sm:px-8 sm:pt-24">
+      <header className="animate-rise text-center">
+        <p className="eyebrow">Resume analyzer for students</p>
+        <h1 className="mx-auto mt-5 max-w-3xl text-[40px] font-medium leading-[1.05] tracking-[-0.035em] text-ink sm:text-6xl">
+          Know exactly where your resume <span className="font-serif text-[1.08em] font-normal italic tracking-[-0.01em]">stands.</span>
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-ink-2 sm:text-lg">
+          A score out of 100, an ATS keyword match and a prioritized list of fixes,
+          each backed by the evidence that produced it.
         </p>
-      </div>
+      </header>
 
-      <form onSubmit={submit} className="mt-10 space-y-8 rounded-3xl border border-line bg-card/60 p-5 sm:p-8" aria-busy={busy}>
+      <form onSubmit={submit} className="animate-rise mt-16 space-y-12 [animation-delay:120ms]" aria-busy={busy}>
         {rolesError ? (
           <ErrorState title="Couldn't load roles" message={rolesError} onRetry={loadRoles} />
         ) : roles ? (
           <RoleSelector roles={roles} value={role} onChange={setRole} disabled={busy} />
         ) : (
-          <div className="grid gap-2 sm:grid-cols-3" aria-label="Loading roles">
-            {[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20" />)}
+          <div aria-label="Loading roles">
+            <Skeleton className="mb-4 h-3 w-28" />
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[74px] !rounded-2xl" />)}
+            </div>
           </div>
         )}
 
@@ -68,34 +74,34 @@ export default function UploadPage() {
           onFile={(f) => { setFile(f); setError(null); setPhase('idle') }}
           onReject={(message) => { setFile(null); setError(message); setPhase('error') }} />
 
-        <div aria-live="polite">
-          {busy && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-ink-2">{progress < 100 ? 'Uploading...' : 'Parsing and checking layout...'}</span>
-                <span className="tabular-nums text-ink-3">{progress}%</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-accent/20" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} aria-label="Upload progress">
-                <div className="h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${progress}%` }} />
-              </div>
-            </div>
-          )}
-          {phase === 'error' && error && <ErrorState title="Upload failed" message={error} />}
-        </div>
-
-        <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-ink-3">Your file is parsed in memory and not stored; only the extracted text is kept.</p>
-          <button type="submit" className="btn-primary" disabled={!file || !role || busy}>
-            {busy ? 'Analyzing...' : 'Analyze resume'} <Icon name="arrowRight" className="size-4" />
+        <div className="flex flex-col items-center gap-4">
+          <button type="submit" className="btn-primary w-full sm:w-auto sm:min-w-56" disabled={!file || !role || busy}>
+            {busy ? (progress < 100 ? `Uploading ${progress}%` : 'Analyzing...') : 'Analyze resume'}
+            {!busy && <Icon name="arrowRight" className="size-4" />}
           </button>
+          <div aria-live="polite" className="w-full max-w-sm">
+            {busy && (
+              <div className="h-px overflow-hidden bg-line" role="progressbar" aria-label="Upload progress"
+                aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
+                <div className="h-full bg-ink transition-[width] duration-300" style={{ width: `${progress}%` }} />
+              </div>
+            )}
+            {phase === 'error' && error && (
+              <p role="alert" className="flex items-center justify-center gap-2 text-sm text-critical-ink">
+                <Icon name="alert" className="size-4" /> {error}
+              </p>
+            )}
+          </div>
+          <p className="text-xs text-ink-3">Parsed in memory. Your file is never stored.</p>
         </div>
       </form>
 
-      <ul className="mt-10 grid gap-4 sm:grid-cols-3">
+      <ul className="mt-24 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3">
         {FEATURES.map((f) => (
-          <li key={f.title} className="rounded-2xl border border-line bg-card p-5">
-            <p className="font-medium text-ink">{f.title}</p>
-            <p className="mt-1 text-sm text-ink-2">{f.text}</p>
+          <li key={f.title} className="bg-page p-6">
+            <p className="font-serif text-3xl italic text-ink">{f.figure}</p>
+            <p className="mt-4 text-sm font-medium text-ink">{f.title}</p>
+            <p className="mt-1 text-sm leading-relaxed text-ink-3">{f.text}</p>
           </li>
         ))}
       </ul>
