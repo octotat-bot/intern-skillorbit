@@ -40,18 +40,22 @@ def register_error_handlers(app: Flask) -> None:
 
     @app.errorhandler(ApiError)
     def handle_api_error(exc: ApiError):
+        """Expected client errors raised by routes."""
         return _error_response(exc.status, exc.code, exc.message)
 
     @app.errorhandler(RequestEntityTooLarge)
     def handle_too_large(_exc: RequestEntityTooLarge):
+        """Request body over MAX_CONTENT_LENGTH."""
         limit_mb = config.MAX_FILE_SIZE_BYTES // (1024 * 1024)
         return _error_response(413, "file_too_large", f"Files must be {limit_mb} MB or smaller.")
 
     @app.errorhandler(HTTPException)
     def handle_http_exception(exc: HTTPException):
+        """Any other HTTP error (404, 405...)."""
         return _error_response(exc.code or 500, _snake_case(exc.name), exc.description or exc.name)
 
     @app.errorhandler(Exception)
     def handle_unexpected(exc: Exception):
+        """Unhandled exceptions: log details, return a generic 500."""
         app.logger.exception("Unhandled error: %s", exc)
         return _error_response(500, "internal_error", "An unexpected error occurred.")

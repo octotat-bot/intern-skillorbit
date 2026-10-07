@@ -24,6 +24,9 @@ def create_app() -> Flask:
     """
     app = Flask(__name__)
     app.config["MAX_CONTENT_LENGTH"] = config.MAX_REQUEST_BYTES
+    # Keep insertion order: sections are in document order and score parameters
+    # in their defined order. Flask sorts JSON keys alphabetically by default.
+    app.json.sort_keys = False
 
     CORS(app, origins=config.CORS_ORIGINS)
 

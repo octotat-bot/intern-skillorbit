@@ -119,6 +119,15 @@ class Entry:
     lines: list[str] = field(default_factory=list)
 
     @property
+    def name(self) -> str:
+        """Title, or the first few words of the first line for untitled entries."""
+        if self.title:
+            return self.title
+        words = (self.lines[0] if self.lines else "Untitled").split()
+        clipped = " ".join(words[: config.ENTRY_NAME_MAX_WORDS])
+        return clipped + ("..." if len(words) > config.ENTRY_NAME_MAX_WORDS else "")
+
+    @property
     def text(self) -> str:
         """Title and description as one block of text."""
         return "\n".join([self.title, *self.lines]).strip()

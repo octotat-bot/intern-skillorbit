@@ -1,0 +1,29 @@
+# Render Blueprint: deploys the Flask API. Frontend is deployed on Vercel (see docs/deployment.md).
+services:
+  - type: web
+    name: resume-analyzer-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
+    startCommand: gunicorn -c gunicorn.conf.py "app:create_app()"
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: CORS_ORIGINS            # set to your Vercel URL, comma-separated if several
+        sync: false
+      - key: DATABASE_PATH
+        value: instance/resumes.db   # ephemeral on the free plan; see docs/deployment.md
+      - key: MAX_FILE_SIZE_MB
+        value: "5"
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY          # optional; leave unset to run rules-only
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: EMBEDDING_PROVIDER
+        value: tfidf

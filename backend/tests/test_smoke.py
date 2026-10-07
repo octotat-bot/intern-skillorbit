@@ -30,7 +30,3 @@ def test_unknown_route_returns_json_404(client) -> None:
     assert response.status_code == 404
     assert response.get_json()["error"] == "not_found"
 
-
-def test_endpoints_for_later_phases_return_501(client) -> None:
-    assert client.get("/api/roles").status_code == 501
-    assert client.get("/api/resumes/1/analysis").status_code == 501

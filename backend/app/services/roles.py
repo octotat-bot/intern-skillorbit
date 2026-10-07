@@ -76,6 +76,9 @@ class RoleCatalog:
 
 
 def _parse_requirement(raw: dict[str, Any], role_id: str) -> Requirement:
+
+
+    """Validate and build one must-have requirement."""
     any_of = tuple(s.lower() for s in raw.get("any_of", []))
     weight = raw.get("weight", 0)
     if not any_of:
@@ -86,6 +89,9 @@ def _parse_requirement(raw: dict[str, Any], role_id: str) -> Requirement:
 
 
 def _parse_role(raw: dict[str, Any]) -> Role:
+
+
+    """Validate and build one role."""
     role_id = raw["id"]
     if not raw.get("must_have"):
         raise RoleCatalogError(f"{role_id}: must_have is empty")

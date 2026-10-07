@@ -76,6 +76,8 @@ class SkillMatcher:
         ]
 
     def _lemma_doc(self, doc: Doc) -> Doc:
+
+        """Rebuild a doc from lemma forms so inflected nouns align with patterns."""
         return Doc(self._nlp.vocab, words=[_lemma_form(token) for token in doc])
 
     def find(self, text: str) -> list[SkillHit]:

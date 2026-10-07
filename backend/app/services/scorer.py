@@ -32,6 +32,7 @@ PARAMETER_LABELS: dict[str, str] = {
 # Helpers
 # ---------------------------------------------------------------------------
 def _round(value: float) -> float:
+    """Round a score to the configured precision."""
     return round(value, config.SCORE_DECIMALS)
 
 
@@ -49,6 +50,9 @@ def _check(check_id: str, label: str, points: float, max_points: int, detail: st
 
 
 def _parameter(name: str, checks: list[Check]) -> Parameter:
+
+
+    """Wrap checks into a parameter result with its total and maximum."""
     return {
         "label": PARAMETER_LABELS[name],
         "score": _round(sum(c["points"] for c in checks)),
@@ -58,10 +62,16 @@ def _parameter(name: str, checks: list[Check]) -> Parameter:
 
 
 def _has(sections: dict[str, str], name: str) -> bool:
+
+
+    """True if a section exists and has content."""
     return bool(sections.get(name, "").strip())
 
 
 def _band(total: int) -> str:
+
+
+    """Label for a total score, e.g. 'Good'."""
     return next(label for minimum, label in config.SCORE_BANDS if total >= minimum)
 
 
@@ -77,6 +87,9 @@ def _range_fraction(value: int, low: int, high: int) -> float:
 
 
 def _quote(items: list[str], limit: int = 3) -> str:
+
+
+    """Quote up to ``limit`` items for evidence text."""
     shown = ", ".join(f"'{item}'" for item in items[:limit])
     return shown + (f" (+{len(items) - limit} more)" if len(items) > limit else "")
 
@@ -193,9 +206,11 @@ def score_projects(sections: dict[str, str]) -> Parameter:
     with_tech = [p for p in projects if matcher.find_skills(p.text)]
     strong = [line for line in lines if (verb := features.leading_verb(line)) and verb.strength == "strong"]
     quantified = [p for p in projects if any(features.find_metrics(line) for line in p.lines)]
-    names = [p.title or p.lines[0][:40] for p in projects]
+    names = [p.name for p in projects]
 
     def share(part: list, whole: list) -> float:
+
+        """Fraction of ``whole`` that is in ``part``."""
         return len(part) / len(whole) if whole else 0.0
 
     checks = [
@@ -293,6 +308,14 @@ def score_quality(sections: dict[str, str], stats: dict[str, Any]) -> Parameter:
     bullet_styles = stats.get("bullet_styles", [])
     dates = features.date_styles(body)
 
+    coverage = min(1.0, words / config.MIN_RESUME_WORDS) if config.SCALE_ABSENCE_CHECKS_BY_LENGTH else 1.0
+    scaled_note = f" (credit scaled to {coverage:.0%}: only {words} words)" if coverage < 1 else ""
+
+    def absence(points: float) -> float:
+
+        """Scale an absence check's points by content coverage."""
+        return points * coverage
+
     checks = [
         _check("quality.length", "Resume length",
                _scaled(config.QUALITY_LENGTH_POINTS,
@@ -305,22 +328,22 @@ def score_quality(sections: dict[str, str], stats: dict[str, Any]) -> Parameter:
                f"{len(strong)} strong, {len(weak)} weak" + (f"; weak: {_quote(weak)}" if weak else "")
                if verbs else "No experience/project bullets start with a verb"),
         _check("quality.first_person", "No first-person pronouns",
-               _tiered(config.QUALITY_NO_FIRST_PERSON_POINTS, len(pronouns), config.FIRST_PERSON_PARTIAL_MAX),
+               absence(_tiered(config.QUALITY_NO_FIRST_PERSON_POINTS, len(pronouns), config.FIRST_PERSON_PARTIAL_MAX)),
                config.QUALITY_NO_FIRST_PERSON_POINTS,
-               f"{len(pronouns)} found: {_quote(pronouns)}" if pronouns else "None found"),
+               (f"{len(pronouns)} found: {_quote(pronouns)}" if pronouns else "None found") + scaled_note),
         _check("quality.filler", "No filler phrases",
-               _tiered(config.QUALITY_NO_FILLER_POINTS, len(filler), config.FILLER_PARTIAL_MAX),
+               absence(_tiered(config.QUALITY_NO_FILLER_POINTS, len(filler), config.FILLER_PARTIAL_MAX)),
                config.QUALITY_NO_FILLER_POINTS,
-               f"{len(filler)} found: {_quote(filler)}" if filler else "None found"),
+               (f"{len(filler)} found: {_quote(filler)}" if filler else "None found") + scaled_note),
         _check("quality.bullet_consistency", "Consistent bullet style",
-               config.QUALITY_BULLET_CONSISTENCY_POINTS if len(bullet_styles) <= 1 else 0,
+               absence(config.QUALITY_BULLET_CONSISTENCY_POINTS if len(bullet_styles) <= 1 else 0),
                config.QUALITY_BULLET_CONSISTENCY_POINTS,
-               f"Bullet styles: {' '.join(bullet_styles)}" if bullet_styles else "No bullets used"),
+               (f"Bullet styles: {' '.join(bullet_styles)}" if bullet_styles else "No bullets used") + scaled_note),
         _check("quality.date_consistency", "Consistent date format",
-               config.QUALITY_DATE_CONSISTENCY_POINTS if len(dates) <= 1 else 0,
+               absence(config.QUALITY_DATE_CONSISTENCY_POINTS if len(dates) <= 1 else 0),
                config.QUALITY_DATE_CONSISTENCY_POINTS,
-               "; ".join(f"{style} e.g. '{example}'" for style, example in dates.items())
-               if dates else "No month-level dates found"),
+               ("; ".join(f"{style} e.g. '{example}'" for style, example in dates.items())
+                if dates else "No month-level dates found") + scaled_note),
     ]
     return _parameter("quality", checks)
 

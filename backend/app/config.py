@@ -93,6 +93,7 @@ SKILLS_COUNT_POINTS: int = 10
 IDEAL_PROJECT_COUNT_MIN: int = 3
 IDEAL_PROJECT_COUNT_MAX: int = 5
 DESCRIPTION_MIN_WORDS: int = 12      # lines this long are descriptions, not titles
+ENTRY_NAME_MAX_WORDS: int = 6        # untitled entries are named by their first words
 PROJECT_COUNT_POINTS: int = 6
 PROJECT_TECH_NAMED_POINTS: int = 5
 PROJECT_ACTION_VERB_POINTS: int = 5
@@ -124,6 +125,9 @@ QUALITY_NO_FIRST_PERSON_POINTS: int = 4
 QUALITY_NO_FILLER_POINTS: int = 3
 QUALITY_BULLET_CONSISTENCY_POINTS: int = 2
 QUALITY_DATE_CONSISTENCY_POINTS: int = 1
+# "Absence" checks (no pronouns, no filler, consistent bullets/dates) prove little
+# on a near-empty resume, so their points scale with content up to MIN_RESUME_WORDS.
+SCALE_ABSENCE_CHECKS_BY_LENGTH: bool = True
 FIRST_PERSON_PARTIAL_MAX: int = 2    # 1-2 pronouns -> half points; more -> zero
 FILLER_PARTIAL_MAX: int = 1          # 1 filler phrase -> half points; more -> zero
 
@@ -149,7 +153,7 @@ STRONG_ACTION_VERBS: list[str] = [
     "configure", "migrate", "refactor", "scale", "spearhead", "orchestrate", "mentor",
     "collaborate", "resolve", "train", "forecast", "visualize", "cut", "boost",
     "accelerate", "achieve", "conduct", "publish", "win", "secure", "debug", "test",
-    "model", "program", "coordinate", "organize",
+    "model", "program", "coordinate", "organize", "present", "research",
 ]
 WEAK_VERBS: list[str] = [
     "do", "make", "work", "help", "use", "be", "have", "get", "go", "try",
@@ -166,6 +170,7 @@ IRREGULAR_VERB_FORMS: dict[str, list[str]] = {
     "build": ["built"], "lead": ["led"], "make": ["made"], "do": ["did", "done", "does"],
     "win": ["won"], "cut": ["cut"], "have": ["had", "has"], "get": ["got"],
     "go": ["went", "gone"], "be": ["was", "were", "is", "am", "are"], "learn": ["learnt"],
+    "forecast": ["forecast", "forecasted"],
 }
 FIRST_PERSON_PRONOUNS: list[str] = ["I", "me", "my", "myself", "mine"]
 FILLER_PHRASES: list[str] = [
@@ -284,15 +289,38 @@ PARSE_ISSUES: dict[str, dict[str, int | str]] = {
 PARSE_QUALITY_LEVELS: dict[str, int] = {"good": 85, "fair": 60}  # else "poor"
 
 # ---------------------------------------------------------------------------
-# Feedback
+# Feedback rule engine
 # ---------------------------------------------------------------------------
-FEEDBACK_MAX_SUGGESTIONS: int = 20
+FEEDBACK_MAX_SUGGESTIONS: int = 25        # cap on returned suggestions (total is still reported)
+PRIORITY_ORDER: dict[str, int] = {"high": 0, "medium": 1, "low": 2}
+MAX_EVIDENCE_ITEMS: int = 5               # evidence lines shown per suggestion
+MAX_NICE_TO_HAVE_LISTED: int = 6          # nice-to-have skills named in one suggestion
+BULLET_MAX_WORDS: int = 30                # longer bullets are hard to scan
+REPEATED_VERB_MIN_COUNT: int = 3          # same opening verb this often -> vary wording
+TFIDF_LOW_SIMILARITY: float = 0.12        # below this, wording is far from the role
+GPA_PATTERN: str = r"\b(?:c?gpa|cpi|sgpa|percentage)\b|\d{1,2}(?:\.\d+)?\s?%|\d(?:\.\d+)?\s?/\s?(?:10|4)(?:\.0)?\b"
+# Parse-quality issues that get their own suggestion (others are covered by
+# content rules, e.g. too_short -> Q01).
+FORMAT_ISSUE_PRIORITY: dict[str, str] = {
+    "non_extractable": "high", "multi_column": "high", "tables": "medium",
+    "fragmented_text": "medium", "images": "low",
+}
 
 # ---------------------------------------------------------------------------
-# RAG / AI (Phase 5) — optional
+# RAG / AI layer (optional at runtime)
 # ---------------------------------------------------------------------------
+LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "gemini")        # "gemini" | "none"
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
-EMBEDDING_PROVIDER: str = os.getenv("EMBEDDING_PROVIDER", "tfidf")
-ST_MODEL_NAME: str = os.getenv("ST_MODEL_NAME", "all-MiniLM-L6-v2")
-RAG_TOP_K: int = 5
+GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+EMBEDDING_PROVIDER: str = os.getenv("EMBEDDING_PROVIDER", "tfidf")   # "tfidf" | "gemini"
+GEMINI_EMBEDDING_MODEL: str = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
+AI_TIMEOUT_SECONDS: int = int(os.getenv("AI_TIMEOUT_SECONDS", "25"))
+AI_TEMPERATURE: float = 0.2
+AI_CACHE_SIZE: int = 64                  # cached generations per process
+KB_INDEX_PATH = KB_DIR / "index.npz"     # shipped vector store (TF-IDF)
+RAG_TOP_K: int = 6                       # chunks given to the LLM
+RAG_ROLE_CHUNKS: int = 2                 # of which at least this many are role-specific
+RAG_SECTION_BOOST: float = 0.15          # added to similarity when a chunk covers a weak area
+RAG_WEAK_PARAMETER_RATIO: float = 0.75   # parameter below this share of its max is "weak"
+RAG_MAX_BULLETS: int = 4                 # weak bullets sent for rewriting
+RAG_MAX_SKILL_GAPS: int = 4              # missing skills sent for explanation

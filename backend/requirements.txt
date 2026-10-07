@@ -28,9 +28,8 @@ numpy>=1.24,<3.0             # vector math + local embedding store
 
 # RAG / AI mode (Phase 5) — OPTIONAL at runtime.
 # The app runs fully without these; AI mode degrades to rule-based output.
-google-generativeai>=0.5,<1.0   # Gemini provider (needs GEMINI_API_KEY)
-# faiss-cpu>=1.7,<2.0           # optional vector store; default store is numpy
-# sentence-transformers>=2.2    # optional local embedder; default is TF-IDF
+google-genai>=1.0,<2.0          # Gemini LLM + embeddings (needs GEMINI_API_KEY)
+# Vector store is a NumPy .npz file shipped in app/data/kb/; no FAISS needed at this size.
 
 # Testing
 pytest>=7.0,<9.0
