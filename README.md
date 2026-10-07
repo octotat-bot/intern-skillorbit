@@ -58,9 +58,24 @@ How each score is computed is explained in [docs/ai_logic.md](docs/ai_logic.md).
 
 ## Quick start
 
-Prerequisites: Python 3.11+, Node.js 18+.
+Prerequisites: Python 3.11+, Node.js 18+ (macOS or Linux shell for the scripts).
 
-### Backend
+### One command
+
+```bash
+./scripts/start.sh           # backend + frontend dev servers; first run installs dependencies
+./scripts/start.sh --prod    # gunicorn + built frontend, closer to production
+./scripts/stop.sh            # stop both (or: ./scripts/stop.sh backend)
+```
+
+`start.sh` waits until both services answer, then prints the URL (normally
+http://localhost:5173). If a default port is busy, for example 5000 taken by macOS AirPlay, it picks
+the next free port and points the frontend and CORS at it. Force ports with
+`BACKEND_PORT=5001 FRONTEND_PORT=5174 ./scripts/start.sh`. PIDs and logs are kept in `.run/`.
+
+### Manual setup
+
+#### Backend
 
 ```bash
 cd backend
@@ -75,7 +90,7 @@ python run.py                       # http://localhost:5000/api/health
 On macOS, port 5000 may be taken by AirPlay Receiver. If so, run `PORT=5001 python run.py` and set
 `VITE_API_BASE_URL=http://localhost:5001` in the frontend.
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
@@ -178,5 +193,6 @@ resume-analyzer/
     requirements.txt, run.py, Procfile, gunicorn.conf.py, .env.example
   frontend/         React + Vite + Tailwind app (src/pages, src/components, src/api)
   docs/             architecture, AI logic, API, evaluation, deployment, outlines, screenshots
+  scripts/          start.sh / stop.sh for local development
   render.yaml
 ```
