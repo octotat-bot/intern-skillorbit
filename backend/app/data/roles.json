@@ -1,0 +1,685 @@
+{
+  "_schema": {
+    "roles[].must_have": "Weighted requirements. Each is satisfied when ANY skill in any_of is found.",
+    "roles[].nice_to_have": "Unweighted bonus skills (canonical names).",
+    "roles[].aliases": "Role-specific alias -> canonical skill, merged over common_aliases.",
+    "common_aliases": "Alias -> canonical skill, shared by all roles.",
+    "case_sensitive_terms": "Exact-case surface form -> canonical skill, for ambiguous short names.",
+    "display_names": "Canonical skill -> label shown in the UI (default: title case).",
+    "extra_skills": "Technologies recognised everywhere (e.g. 'tech named per project') but not required by any role."
+  },
+  "common_aliases": {
+    "js": "javascript",
+    "ecmascript": "javascript",
+    "es6": "javascript",
+    "ts": "typescript",
+    "reactjs": "react",
+    "react.js": "react",
+    "react js": "react",
+    "nodejs": "node.js",
+    "node js": "node.js",
+    "expressjs": "express",
+    "express.js": "express",
+    "vuejs": "vue",
+    "vue.js": "vue",
+    "nextjs": "next.js",
+    "next js": "next.js",
+    "angularjs": "angular",
+    "html5": "html",
+    "css3": "css",
+    "tailwind": "tailwind css",
+    "tailwindcss": "tailwind css",
+    "python3": "python",
+    "golang": "go",
+    "ml": "machine learning",
+    "dl": "deep learning",
+    "nlp": "natural language processing",
+    "gen ai": "generative ai",
+    "genai": "generative ai",
+    "llms": "llm",
+    "large language model": "llm",
+    "large language models": "llm",
+    "sklearn": "scikit-learn",
+    "scikit learn": "scikit-learn",
+    "huggingface": "hugging face",
+    "postgres": "postgresql",
+    "mongo": "mongodb",
+    "ms sql": "sql server",
+    "mssql": "sql server",
+    "k8s": "kubernetes",
+    "amazon web services": "aws",
+    "gcp": "google cloud",
+    "google cloud platform": "google cloud",
+    "microsoft azure": "azure",
+    "ci cd": "ci/cd",
+    "cicd": "ci/cd",
+    "continuous integration": "ci/cd",
+    "continuous deployment": "ci/cd",
+    "iac": "infrastructure as code",
+    "powerbi": "power bi",
+    "power-bi": "power bi",
+    "ms excel": "excel",
+    "microsoft excel": "excel",
+    "advanced excel": "excel",
+    "restful": "rest api",
+    "restful api": "rest api",
+    "restful apis": "rest api",
+    "rest apis": "rest api",
+    "eda": "exploratory data analysis",
+    "data visualisation": "data visualization",
+    "visualization": "data visualization",
+    "visualisation": "data visualization",
+    "data wrangling": "data cleaning",
+    "data cleansing": "data cleaning",
+    "data preprocessing": "data cleaning",
+    "ab testing": "a/b testing",
+    "a/b test": "a/b testing",
+    "split testing": "a/b testing",
+    "statistical analysis": "statistics",
+    "stats": "statistics",
+    "mobile-first": "responsive design",
+    "mobile first": "responsive design",
+    "responsive web design": "responsive design",
+    "web accessibility": "accessibility",
+    "a11y": "accessibility",
+    "wcag": "accessibility",
+    "shell scripting": "bash",
+    "shell script": "bash",
+    "github action": "github actions",
+    "big query": "bigquery",
+    "opencv-python": "opencv",
+    "hypothesis testing": "statistics"
+  },
+  "case_sensitive_terms": {
+    "R": "r",
+    "C": "c",
+    "Go": "go",
+    "Excel": "excel"
+  },
+  "extra_skills": [
+    "c",
+    "c++",
+    "c#",
+    "java",
+    "go",
+    "rust",
+    "kotlin",
+    "swift",
+    "php",
+    "ruby",
+    "dart",
+    "flutter",
+    "android",
+    "ios",
+    "spring",
+    "arduino",
+    "raspberry pi",
+    "matlab",
+    "unity",
+    "blockchain",
+    "solidity",
+    "selenium",
+    "postman",
+    "jira",
+    "streamlit",
+    "heroku",
+    "vercel",
+    "netlify",
+    "supabase",
+    "kafka",
+    "spark",
+    "hadoop",
+    "airflow",
+    "snowflake",
+    "power automate",
+    "sap",
+    "salesforce",
+    "wordpress",
+    "jquery",
+    "socket.io",
+    "websocket",
+    "oracle",
+    "dynamodb",
+    "cassandra",
+    "elasticsearch",
+    "rabbitmq",
+    "openai api",
+    "gemini api",
+    "chatgpt"
+  ],
+  "display_names": {
+    "sql": "SQL",
+    "html": "HTML",
+    "css": "CSS",
+    "aws": "AWS",
+    "gcp": "GCP",
+    "r": "R",
+    "c": "C",
+    "rest api": "REST API",
+    "ci/cd": "CI/CD",
+    "llm": "LLM",
+    "etl": "ETL",
+    "seo": "SEO",
+    "node.js": "Node.js",
+    "next.js": "Next.js",
+    "javascript": "JavaScript",
+    "typescript": "TypeScript",
+    "postgresql": "PostgreSQL",
+    "mysql": "MySQL",
+    "mongodb": "MongoDB",
+    "graphql": "GraphQL",
+    "numpy": "NumPy",
+    "scikit-learn": "scikit-learn",
+    "pytorch": "PyTorch",
+    "tensorflow": "TensorFlow",
+    "opencv": "OpenCV",
+    "mlops": "MLOps",
+    "bigquery": "BigQuery",
+    "a/b testing": "A/B testing",
+    "power bi": "Power BI",
+    "sql server": "SQL Server",
+    "iam": "IAM",
+    "ec2": "EC2",
+    "s3": "S3",
+    "github actions": "GitHub Actions",
+    "fastapi": "FastAPI",
+    "jwt": "JWT",
+    "oauth": "OAuth",
+    "sqlite": "SQLite",
+    "google cloud": "Google Cloud",
+    "aws lambda": "AWS Lambda",
+    "langchain": "LangChain",
+    "c++": "C++",
+    "c#": "C#",
+    "php": "PHP",
+    "ios": "iOS",
+    "jquery": "jQuery",
+    "socket.io": "Socket.IO",
+    "sap": "SAP",
+    "openai api": "OpenAI API",
+    "gemini api": "Gemini API",
+    "chatgpt": "ChatGPT",
+    "dynamodb": "DynamoDB",
+    "rabbitmq": "RabbitMQ",
+    "go": "Go"
+  },
+  "roles": [
+    {
+      "id": "data_analyst",
+      "name": "Data Analyst",
+      "description": "Data analysts collect, clean and analyze data to answer business questions. They write SQL queries against relational databases, analyze data in Python or R with pandas, and use Excel for quick analysis. They build dashboards and data visualizations in Tableau or Power BI, apply statistics and A/B testing to measure impact, and present insights and reports to stakeholders.",
+      "must_have": [
+        {
+          "label": "SQL",
+          "weight": 3,
+          "any_of": [
+            "sql",
+            "mysql",
+            "postgresql",
+            "sql server",
+            "sqlite",
+            "bigquery"
+          ]
+        },
+        {
+          "label": "Python or R",
+          "weight": 2,
+          "any_of": [
+            "python",
+            "r"
+          ]
+        },
+        {
+          "label": "Excel",
+          "weight": 2,
+          "any_of": [
+            "excel",
+            "google sheets"
+          ]
+        },
+        {
+          "label": "Tableau / Power BI",
+          "weight": 2,
+          "any_of": [
+            "tableau",
+            "power bi",
+            "looker"
+          ]
+        },
+        {
+          "label": "Statistics",
+          "weight": 2,
+          "any_of": [
+            "statistics"
+          ]
+        },
+        {
+          "label": "Data visualization",
+          "weight": 1,
+          "any_of": [
+            "data visualization",
+            "dashboard",
+            "matplotlib",
+            "seaborn"
+          ]
+        },
+        {
+          "label": "Data cleaning",
+          "weight": 1,
+          "any_of": [
+            "data cleaning",
+            "pandas"
+          ]
+        }
+      ],
+      "nice_to_have": [
+        "pandas",
+        "numpy",
+        "a/b testing",
+        "exploratory data analysis",
+        "etl",
+        "machine learning",
+        "bigquery",
+        "data modeling",
+        "git",
+        "storytelling"
+      ],
+      "aliases": {
+        "data storytelling": "storytelling",
+        "data model": "data modeling",
+        "data modelling": "data modeling",
+        "dashboards": "dashboard"
+      }
+    },
+    {
+      "id": "web_developer",
+      "name": "Web Developer",
+      "description": "Web developers build responsive, accessible websites and web applications. They write semantic HTML, modern CSS and JavaScript or TypeScript, and use a frontend framework such as React, Angular or Vue. They integrate REST APIs, use Git for version control, optimize performance and SEO, and test across browsers and devices.",
+      "must_have": [
+        {
+          "label": "HTML",
+          "weight": 3,
+          "any_of": [
+            "html"
+          ]
+        },
+        {
+          "label": "CSS",
+          "weight": 3,
+          "any_of": [
+            "css",
+            "tailwind css",
+            "sass",
+            "bootstrap"
+          ]
+        },
+        {
+          "label": "JavaScript",
+          "weight": 3,
+          "any_of": [
+            "javascript",
+            "typescript"
+          ]
+        },
+        {
+          "label": "React / Angular / Vue",
+          "weight": 2,
+          "any_of": [
+            "react",
+            "angular",
+            "vue",
+            "next.js",
+            "svelte"
+          ]
+        },
+        {
+          "label": "Responsive design",
+          "weight": 2,
+          "any_of": [
+            "responsive design"
+          ]
+        },
+        {
+          "label": "Git",
+          "weight": 1,
+          "any_of": [
+            "git",
+            "github"
+          ]
+        },
+        {
+          "label": "REST APIs",
+          "weight": 1,
+          "any_of": [
+            "rest api",
+            "fetch api",
+            "axios"
+          ]
+        }
+      ],
+      "nice_to_have": [
+        "typescript",
+        "tailwind css",
+        "bootstrap",
+        "sass",
+        "node.js",
+        "webpack",
+        "vite",
+        "accessibility",
+        "seo",
+        "figma",
+        "jest",
+        "redux",
+        "next.js"
+      ],
+      "aliases": {
+        "scss": "sass",
+        "reduxjs": "redux"
+      }
+    },
+    {
+      "id": "ai_ml_engineer",
+      "name": "AI/ML Engineer",
+      "description": "AI and machine learning engineers design, train, evaluate and deploy machine learning and deep learning models. They program in Python with NumPy and pandas, use frameworks such as scikit-learn, TensorFlow and PyTorch, and perform feature engineering and model evaluation. They work on natural language processing, computer vision and large language models, and deploy models to production with Docker, APIs and MLOps practices.",
+      "must_have": [
+        {
+          "label": "Python",
+          "weight": 3,
+          "any_of": [
+            "python"
+          ]
+        },
+        {
+          "label": "Machine learning",
+          "weight": 3,
+          "any_of": [
+            "machine learning"
+          ]
+        },
+        {
+          "label": "Deep learning",
+          "weight": 2,
+          "any_of": [
+            "deep learning",
+            "neural network"
+          ]
+        },
+        {
+          "label": "ML framework (TensorFlow / PyTorch / scikit-learn)",
+          "weight": 2,
+          "any_of": [
+            "tensorflow",
+            "pytorch",
+            "keras",
+            "scikit-learn"
+          ]
+        },
+        {
+          "label": "NumPy / pandas",
+          "weight": 1,
+          "any_of": [
+            "numpy",
+            "pandas"
+          ]
+        },
+        {
+          "label": "Statistics",
+          "weight": 1,
+          "any_of": [
+            "statistics",
+            "linear algebra",
+            "probability"
+          ]
+        },
+        {
+          "label": "Model evaluation & feature engineering",
+          "weight": 1,
+          "any_of": [
+            "feature engineering",
+            "model evaluation",
+            "cross-validation",
+            "hyperparameter tuning"
+          ]
+        }
+      ],
+      "nice_to_have": [
+        "natural language processing",
+        "computer vision",
+        "llm",
+        "generative ai",
+        "hugging face",
+        "transformers",
+        "mlops",
+        "docker",
+        "model deployment",
+        "sql",
+        "git",
+        "aws",
+        "langchain",
+        "opencv",
+        "flask",
+        "fastapi"
+      ],
+      "aliases": {
+        "neural networks": "neural network",
+        "cnn": "deep learning",
+        "cnns": "deep learning",
+        "rnn": "deep learning",
+        "lstm": "deep learning",
+        "cross validation": "cross-validation",
+        "hyper-parameter tuning": "hyperparameter tuning",
+        "deployed the model": "model deployment",
+        "model serving": "model deployment"
+      }
+    },
+    {
+      "id": "cloud_engineer",
+      "name": "Cloud Engineer",
+      "description": "Cloud engineers design, deploy and operate infrastructure on cloud platforms such as AWS, Azure and Google Cloud. They administer Linux servers, containerize applications with Docker, orchestrate them with Kubernetes, and automate infrastructure as code with Terraform. They build CI/CD pipelines, script automation in Python or Bash, configure networking and security, and monitor systems for reliability.",
+      "must_have": [
+        {
+          "label": "AWS / Azure / GCP",
+          "weight": 3,
+          "any_of": [
+            "aws",
+            "azure",
+            "google cloud"
+          ]
+        },
+        {
+          "label": "Linux",
+          "weight": 2,
+          "any_of": [
+            "linux",
+            "ubuntu",
+            "unix"
+          ]
+        },
+        {
+          "label": "Docker",
+          "weight": 2,
+          "any_of": [
+            "docker"
+          ]
+        },
+        {
+          "label": "Kubernetes",
+          "weight": 2,
+          "any_of": [
+            "kubernetes",
+            "eks",
+            "aks",
+            "gke"
+          ]
+        },
+        {
+          "label": "CI/CD",
+          "weight": 2,
+          "any_of": [
+            "ci/cd",
+            "jenkins",
+            "github actions",
+            "gitlab ci"
+          ]
+        },
+        {
+          "label": "Terraform / IaC",
+          "weight": 2,
+          "any_of": [
+            "terraform",
+            "infrastructure as code",
+            "cloudformation",
+            "ansible"
+          ]
+        },
+        {
+          "label": "Networking",
+          "weight": 1,
+          "any_of": [
+            "networking",
+            "vpc",
+            "dns",
+            "load balancer",
+            "tcp/ip"
+          ]
+        },
+        {
+          "label": "Scripting (Python / Bash)",
+          "weight": 1,
+          "any_of": [
+            "python",
+            "bash",
+            "powershell"
+          ]
+        }
+      ],
+      "nice_to_have": [
+        "prometheus",
+        "grafana",
+        "serverless",
+        "aws lambda",
+        "ec2",
+        "s3",
+        "iam",
+        "helm",
+        "microservices",
+        "git",
+        "monitoring",
+        "security",
+        "nginx"
+      ],
+      "aliases": {
+        "lambda": "aws lambda",
+        "load balancing": "load balancer",
+        "elastic kubernetes service": "eks",
+        "virtual private cloud": "vpc",
+        "cloud security": "security",
+        "observability": "monitoring"
+      }
+    },
+    {
+      "id": "full_stack_developer",
+      "name": "Full Stack Developer",
+      "description": "Full stack developers build complete web applications across the frontend and backend. They write JavaScript or TypeScript, build user interfaces with React, Angular or Vue, and implement backend services and REST APIs with Node.js and Express, Django, Flask or Spring Boot. They design SQL and NoSQL databases such as PostgreSQL and MongoDB, handle authentication, use Git, and deploy with Docker and cloud platforms.",
+      "must_have": [
+        {
+          "label": "JavaScript",
+          "weight": 3,
+          "any_of": [
+            "javascript",
+            "typescript"
+          ]
+        },
+        {
+          "label": "React / Angular / Vue",
+          "weight": 2,
+          "any_of": [
+            "react",
+            "angular",
+            "vue",
+            "next.js"
+          ]
+        },
+        {
+          "label": "Backend framework",
+          "weight": 2,
+          "any_of": [
+            "node.js",
+            "express",
+            "django",
+            "flask",
+            "spring boot",
+            "fastapi"
+          ]
+        },
+        {
+          "label": "SQL / NoSQL database",
+          "weight": 2,
+          "any_of": [
+            "sql",
+            "mysql",
+            "postgresql",
+            "mongodb",
+            "sqlite",
+            "firebase"
+          ]
+        },
+        {
+          "label": "REST APIs",
+          "weight": 2,
+          "any_of": [
+            "rest api",
+            "graphql"
+          ]
+        },
+        {
+          "label": "HTML",
+          "weight": 1,
+          "any_of": [
+            "html"
+          ]
+        },
+        {
+          "label": "CSS",
+          "weight": 1,
+          "any_of": [
+            "css",
+            "tailwind css",
+            "sass",
+            "bootstrap"
+          ]
+        },
+        {
+          "label": "Git",
+          "weight": 1,
+          "any_of": [
+            "git",
+            "github"
+          ]
+        }
+      ],
+      "nice_to_have": [
+        "typescript",
+        "docker",
+        "aws",
+        "graphql",
+        "redis",
+        "ci/cd",
+        "jest",
+        "jwt",
+        "oauth",
+        "microservices",
+        "tailwind css",
+        "next.js",
+        "authentication"
+      ],
+      "aliases": {
+        "springboot": "spring boot",
+        "json web token": "jwt",
+        "json web tokens": "jwt",
+        "oauth2": "oauth",
+        "auth": "authentication"
+      }
+    }
+  ]
+}
