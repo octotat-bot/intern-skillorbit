@@ -14,6 +14,7 @@ const PATHS = {
   refresh: 'M4 4v5h5M20 20v-5h-5M5.6 15A7 7 0 0018.4 15M18.4 9A7 7 0 005.6 9',
   book: 'M12 6.3C10.8 5.5 9.2 5 7.5 5S4.2 5.5 3 6.3v13C4.2 18.5 5.8 18 7.5 18s3.3.5 4.5 1.3m0-13C13.2 5.5 14.8 5 16.5 5s3.3.5 4.5 1.3v13c-1.2-.8-2.8-1.3-4.5-1.3s-3.3.5-4.5 1.3m0-13v13',
   arrowRight: 'M14 5l7 7m0 0l-7 7m7-7H3',
+  download: 'M12 4v12m0 0l-4-4m4 4l4-4M4 18v1a2 2 0 002 2h12a2 2 0 002-2v-1',
 }
 
 export default function Icon({ name, className = 'size-5', title }) {

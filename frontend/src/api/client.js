@@ -27,6 +27,29 @@ export async function fetchAnalysis(resumeId, role, mode = 'rules') {
   return data
 }
 
+/** Download the PDF report for an analysis and save it with the server's filename. */
+export async function downloadReport(resumeId, role, mode = 'rules') {
+  let response
+  try {
+    response = await api.get(`/resumes/${resumeId}/report`, { params: { role, mode }, responseType: 'blob' })
+  } catch (error) {
+    // Error bodies arrive as a Blob here; decode the JSON so errorMessage() can read it.
+    const body = error?.response?.data
+    if (body instanceof Blob) {
+      try { error.response.data = JSON.parse(await body.text()) } catch { /* not JSON: keep as is */ }
+    }
+    throw error
+  }
+  const disposition = response.headers['content-disposition'] || ''
+  const filename = /filename="?([^";]+)"?/.exec(disposition)?.[1] || `resume-${resumeId}-report.pdf`
+  const url = URL.createObjectURL(response.data)
+  const link = Object.assign(document.createElement('a'), { href: url, download: filename })
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
 /** Human-readable message for any API or network error. */
 export function errorMessage(error) {
   const body = error?.response?.data

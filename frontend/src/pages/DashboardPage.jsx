@@ -11,7 +11,7 @@ import SubScoreChart from '../components/SubScoreChart.jsx'
 import SuggestionList from '../components/SuggestionList.jsx'
 import Tabs from '../components/Tabs.jsx'
 import { ErrorState, Meter, Skeleton, StatusLabel } from '../components/ui.jsx'
-import { errorMessage, fetchAnalysis, fetchRoles } from '../api/client.js'
+import { downloadReport, errorMessage, fetchAnalysis, fetchRoles } from '../api/client.js'
 import { useCountUp } from '../hooks/useCountUp.js'
 import { pct, plural, scoreStatus } from '../lib/format.js'
 
@@ -95,6 +95,7 @@ export default function DashboardPage() {
             <Icon name="chevron" className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-ink-3" />
           </label>
           <ModeToggle mode={mode} onChange={(m) => update({ mode: m })} busy={refreshing} />
+          <ReportButton resumeId={resumeId} role={role} mode={mode} />
         </div>
       </header>
 
@@ -124,6 +125,34 @@ export default function DashboardPage() {
       <section aria-label="Details" className="pt-4">
         <Tabs label="Analysis details" tabs={tabs} active={tab} onChange={(id) => update({ tab: id })} />
       </section>
+    </div>
+  )
+}
+
+/** Downloads the PDF report for the current role and mode. */
+function ReportButton({ resumeId, role, mode }) {
+  const [state, setState] = useState({ busy: false, error: null })
+  const download = async () => {
+    setState({ busy: true, error: null })
+    try {
+      await downloadReport(resumeId, role, mode)
+      setState({ busy: false, error: null })
+    } catch (err) {
+      setState({ busy: false, error: errorMessage(err) })
+    }
+  }
+  return (
+    <div className="relative">
+      <button type="button" onClick={download} disabled={state.busy} aria-busy={state.busy}
+        className="focus-ring inline-flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-sm font-medium text-page transition hover:opacity-90 active:scale-[.98] disabled:opacity-50">
+        <Icon name="download" className="size-4" />
+        {state.busy ? 'Preparing...' : 'Report'}
+      </button>
+      {state.error && (
+        <p role="alert" className="absolute right-0 top-11 z-10 w-64 rounded-xl border border-line bg-surface p-3 text-xs text-critical-ink shadow-xl">
+          {state.error}
+        </p>
+      )}
     </div>
   )
 }

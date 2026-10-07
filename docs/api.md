@@ -112,6 +112,18 @@ A suggestion:
   "evidence": ["Not found anywhere in the resume (accepted: Data cleaning, Pandas)", "Requirement weight: 1"] }
 ```
 
+## `GET /api/resumes/{id}/report?role={role_id}&mode={rules|ai}`
+
+The same analysis as a downloadable **PDF report** (summary, formatting risks, prioritized suggestions with
+evidence, skills match, full score breakdown, and AI insights in `ai` mode). Same parameters and errors as
+`/analysis`. The response is `application/pdf` with
+`Content-Disposition: attachment; filename=<resume>-<role>-report.pdf`; that header is exposed via CORS so the
+frontend can keep the filename.
+
+```bash
+curl -OJ "http://localhost:5000/api/resumes/1/report?role=data_analyst"
+```
+
 ### AI mode (illustrative values)
 
 ```json

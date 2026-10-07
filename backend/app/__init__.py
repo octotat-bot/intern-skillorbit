@@ -28,7 +28,8 @@ def create_app() -> Flask:
     # in their defined order. Flask sorts JSON keys alphabetically by default.
     app.json.sort_keys = False
 
-    CORS(app, origins=config.CORS_ORIGINS)
+    # Expose Content-Disposition so the cross-origin frontend can read report filenames.
+    CORS(app, origins=config.CORS_ORIGINS, expose_headers=["Content-Disposition"])
 
     config.DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
     init_db()

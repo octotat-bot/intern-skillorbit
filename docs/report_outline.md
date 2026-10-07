@@ -54,7 +54,7 @@ Suggested length: 25-35 pages. Section numbers map to the grading rubric where n
 ## 6. Testing  _(Code Quality)_
 - 6.1 Strategy: unit, API and pipeline tests; fixture resumes (good, weak, two-column, scanned, table,
   corrupted, encrypted)
-- 6.2 Coverage summary (324 tests, about 99% backend line coverage)
+- 6.2 Coverage summary (336 tests, about 98% backend line coverage)
 - 6.3 Edge cases handled (empty, scanned, corrupted, huge, wrong type, missing sections)
 - 6.4 Bugs found by tests and fixed (phone regex, metric regex, JSON key ordering, mobile overflow)
 

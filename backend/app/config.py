@@ -307,6 +307,14 @@ FORMAT_ISSUE_PRIORITY: dict[str, str] = {
 }
 
 # ---------------------------------------------------------------------------
+# PDF report
+# ---------------------------------------------------------------------------
+REPORT_PAGE_SIZE: str = "a4"
+REPORT_MARGIN_PT: int = 48               # page margin in points (1/72 inch)
+REPORT_FOOTER_OFFSET_PT: int = 24        # footer baseline distance from the page bottom
+REPORT_MAX_SUGGESTIONS: int = 25         # suggestions printed (all returned ones, by default)
+
+# ---------------------------------------------------------------------------
 # RAG / AI layer (optional at runtime)
 # ---------------------------------------------------------------------------
 LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "gemini")        # "gemini" | "none"

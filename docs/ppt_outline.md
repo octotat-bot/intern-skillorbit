@@ -60,7 +60,7 @@
 - Live demo: upload `E06_fresher_average.docx`, switch roles, toggle AI mode
 
 ## 12. Testing
-- 324 automated tests, about 99% backend coverage
+- 336 automated tests, about 98% backend coverage
 - Fixture resumes: good, weak, two-column, scanned, table, corrupted, password-protected
 - Bugs the tests caught: phone numbers vs year ranges, metric parsing, JSON key order
 
